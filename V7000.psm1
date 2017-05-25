@@ -280,7 +280,7 @@ function Get-V7KReplication {
 		{
 			$info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
 			$Item = ConvertFrom-Csv $info
-			$item | % { Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName }
+			$item | ForEach-Object { Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName }
 			$Item | ForEach-Object { $_.PSObject.TypeNames.Insert(0, ’SVC.Replication’) }
 		}
 	}
@@ -399,7 +399,7 @@ function New-V7KReplication {
 			Write-Error "Not connected to $($ComputerName)"
 			break
 		}
-		$Partner = Get-V7KPartnership -ComputerName $ComputerName | ?{$_.location -eq 'remote'}
+		$Partner = Get-V7KPartnership -ComputerName $ComputerName | Where-Object {$_.location -eq 'remote'}
 	    $Cluster = $Partner.ID
 	    $cmd = "mkrcrelationship -master $Master -aux $Aux -cluster $Cluster"
 	    if ($NewName) {$cmd += " -name $NewName"}
@@ -735,7 +735,7 @@ The following define the status fields: Online The MDisk is online and available
     else {
         $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
         $Item = ConvertFrom-Csv $info
-        $item | % {Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName}
+        $item | ForEach-Object {Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName}
         $Item | Add-Member MemberSet PSStandardMembers $PSStandardMembers
     }
 
@@ -820,7 +820,7 @@ function Get-V7KMDiskGroup {
     else {
         $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
         $Item = ConvertFrom-Csv $info
-        $item | % {Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName}
+        $item | ForEach-Object {Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName}
         $Item | Add-Member MemberSet PSStandardMembers $PSStandardMembers
     }
    
@@ -893,7 +893,7 @@ function Get-V7KIOGroup {
     else {
         $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
         $Item = ConvertFrom-Csv $info
-        $item | % {Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName}
+        $item | ForEach-Object {Add-Member -InputObject $_ -MemberType NoteProperty -Name ComputerName -Value $ComputerName}
         $Item | Add-Member MemberSet PSStandardMembers $PSStandardMembers
     }
    
@@ -2640,7 +2640,7 @@ Function New-V7KBackupSnapshot {
     
     "Creating $TargetVolumeName on $Pool" | Out-File $logfile -Append
     New-V7KVDisk -Mdiskgrp $Pool -Name $TargetVolumeName -Size $TargetSize -Unit b
-    "Source volume info: $SoureVolumeInfo" | Select ID,Name,Capacity | Out-File $LogFile -Append
+    "Source volume info: $SoureVolumeInfo" | Select-Object ID,Name,Capacity | Out-File $LogFile -Append
     
     Write-Verbose "Creating snapshot"
     $FlashCopyResult = New-V7KFCMap -Cleanrate 0 -Copyrate 0 -Source $SourceVolume -Target $TargetVolumeName
@@ -2928,7 +2928,7 @@ Function New-V7KSnapshot {
     
     "Creating $TargetVolumeName on $Pool" | Out-File $logfile -Append
     New-V7KVDisk -Mdiskgrp $Pool -Name $TargetVolumeName -Size $TargetSize -Unit b
-    "Source volume info: $SoureVolumeInfo" | Select ID,Name,Capacity | Out-File $LogFile -Append
+    "Source volume info: $SoureVolumeInfo" | Select-Object ID,Name,Capacity | Out-File $LogFile -Append
     
     Write-Verbose "Creating snapshot"
     $FlashCopyResult = New-V7KFCMap -Cleanrate 0 -Copyrate 0 -Source $SourceVolume -Target $TargetVolumeName
@@ -3201,7 +3201,7 @@ Function New-V7KBackupSnapshot {
     
     "Creating $TargetVolumeName on $Pool" | Out-File $logfile -Append
     New-V7KVDisk -Mdiskgrp $Pool -Name $TargetVolumeName -Size $TargetSize -Unit b
-    "Source volume info: $SoureVolumeInfo" | Select ID,Name,Capacity | Out-File $LogFile -Append
+    "Source volume info: $SoureVolumeInfo" | Select-Object ID,Name,Capacity | Out-File $LogFile -Append
     
     Write-Verbose "Creating snapshot"
     $FlashCopyResult = New-V7KFCMap -Cleanrate 0 -Copyrate 0 -Source $SourceVolume -Target $TargetVolumeName
