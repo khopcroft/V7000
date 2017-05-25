@@ -657,28 +657,68 @@ function Switch-V7KReplication {
 function Get-V7KMDisk {
   <#
   	.SYNOPSIS
-		The lsmdisk command returns a concise list or a detailed view of managed disks (MDisks) visible to the cluster. 
+		The Get-V7KMDisk command returns a concise list or a detailed view of managed disks (MDisks) visible to the cluster. 
         It can also list detailed information about a single MDisk. 
 	
 	.DESCRIPTION
 		This command returns a concise list or a detailed view of MDisks visible to the cluster. 
-        Attribute Values status v online v offline v excluded v degraded_paths v degraded_ports v degraded (applies only to internal MDisks) mode unmanaged, managed, image, array quorum_index 0, 1, 2, or blank if the MDisk is not being used as a quorum disk block_size 512, 524 bytes in each block of storage ctrl_type 4, 6, where 6 is a solid-state drive (SSD) attached inside a node and 4 is any other device tier The tier this MDisk has been assigned to by auto-detection (for internal arrays) or by the user: v generic_ssd v generic_hdd (the default value for newly discovered or external MDisk) Note: You can change this value using the chmdisk command. raid_status v offline - the array is offline on all nodes v degraded - the array has deconfigured or offline members; the array is not fully redundant v syncing - array members are all online, the array is syncing parity or mirrors to achieve redundancy v initting - array members are all online, the array is initializing; the array is fully redundant v online - array members are all online, and the array is fully redundant raid_level The RAID level of the array (RAID0, RAID1, RAID5, RAID6, RAID10).
-Chapter 17. Information commands 269
-Table 34. MDisk output (continued) Attribute Values redundancy The number of how many member disks can fail before the array fails. strip_size The strip size of the array (in KB). spare_goal The number of spares that the array members should be protected by. spare_protection_min The minimum number of spares that an array member is protected by. balanced Describes if the array is balanced to its spare goals: v exact: all populated members have exact capability match, exact location match v yes: all populated members have at least exact capability match, exact chain, or different enclosure or slot v no: anything else
-Note: The automatic discovery performed by the cluster does not write anything to an unmanaged MDisk. It is only when you add an MDisk to an MDisk group (storage pool), or use an MDisk to create an image mode VDisk (volume), that the system uses the storage.
-To see which MDisks are available, issue the detectmdisk command to manually rescan the Fibre Channel network for any new MDisks. Issue the lsmdiskcandidate command to show the unmanaged MDisks. These MDisks have not been assigned to an MDisk group (storage pool).
-Notes: 1. A SAN Volume Controller connection from a node or node canister port to a storage controller port for a single MDisk is a path. The Mdisk path_count value is the number of paths currently being used to submit input/output (I/O) to this MDisk. 2. The MDisk max_path_count value is the highest value path_count has reached since the MDisk was last fully online. 3. The preferred_WWPN is one of the World Wide Port Names (WWPNs) the storage controller has specified as a preferred WWPN. If the controller has nothing specified, this is a blank field. 4. The active_WWPN indicates the WWPN of the storage controller port currently being used for I/O. a. If no storage controller ports are available for I/O, this is a blank field. b. If multiple controller ports are actively being used for I/O, this field's value is many.
-The following define the status fields: Online The MDisk is online and available. Degraded (Internal MDisks only) The array has members that are degraded, or the raid_status is degraded. Degraded ports There are one or more MDisk port errors. Degraded paths One or more paths to the MDisk have been lost; the MDisk is not online to every node in the cluster. Offline All paths to the MDisk are lost. Excluded The MDisk is excluded from use by the cluster; the MDisk port error count exceeded the threshold.
+        Attribute Values status v online v offline v excluded v degraded_paths v degraded_ports v degraded (applies only to internal MDisks) 
+        mode unmanaged, managed, image, array quorum_index 0, 1, 2, or blank if the MDisk is not being used as a quorum disk block_size 512, 524 bytes 
+        in each block of storage ctrl_type 4, 6, where 6 is a solid-state drive (SSD) attached inside a node and 4 is any other device tier 
+        The tier this MDisk has been assigned to by auto-detection (for internal arrays) or by the user: v generic_ssd v generic_hdd 
+        (the default value for newly discovered or external MDisk) Note: You can change this value using the chmdisk command. 
+        raid_status v offline - the array is offline on all nodes v degraded - the array has deconfigured or offline members; 
+        the array is not fully redundant v syncing - array members are all online, the array is syncing parity or mirrors to achieve redundancy v initting - array members are all online, 
+        the array is initializing; the array is fully redundant v online - array members are all online, and the array is fully redundant raid_level 
+        The RAID level of the array (RAID0, RAID1, RAID5, RAID6, RAID10).
+        Attribute Values redundancy The number of how many member disks can fail before the array fails. 
+        strip_size The strip size of the array (in KB). 
+        spare_goal The number of spares that the array members should be protected by. 
+        spare_protection_min The minimum number of spares that an array member is protected by. 
+        balanced Describes if the array is balanced to its spare goals: v exact: all populated members have exact capability match, 
+            exact location match v yes: all populated members have at least exact capability match, exact chain, or different enclosure or slot v no: anything else
+
+        Note: The automatic discovery performed by the cluster does not write anything to an unmanaged MDisk. It is only when you add an MDisk 
+        to an MDisk group (storage pool), or use an MDisk to create an image mode VDisk (volume), that the system uses the storage.
+        To see which MDisks are available, issue the detectmdisk command to manually rescan the Fibre Channel network for any new MDisks. 
+        Issue the lsmdiskcandidate command to show the unmanaged MDisks. These MDisks have not been assigned to an MDisk group (storage pool).
+        
+        Notes: 1. A SAN Volume Controller connection from a node or node canister port to a storage controller port for a single MDisk is a path. 
+        The Mdisk path_count value is the number of paths currently being used to submit input/output (I/O) to this MDisk. 
+        
+        2. The MDisk max_path_count value is the highest value path_count has reached since the MDisk was last fully online. 
+        3. The preferred_WWPN is one of the World Wide Port Names (WWPNs) the storage controller has specified as a preferred WWPN. 
+            If the controller has nothing specified, this is a blank field. 
+        4. The active_WWPN indicates the WWPN of the storage controller port currently being used for I/O. a. If no storage controller ports 
+        are available for I/O, this is a blank field. b. If multiple controller ports are actively being used for I/O, this field's value is many.
+
+        The following define the status fields: 
+        Online The MDisk is online and available. 
+        Degraded (Internal MDisks only) The array has members that are degraded, or the raid_status is degraded. 
+        Degraded ports There are one or more MDisk port errors. 
+        Degraded paths One or more paths to the MDisk have been lost; the MDisk is not online to every node in the cluster.
+        Offline All paths to the MDisk are lost. 
+        Excluded The MDisk is excluded from use by the cluster; the MDisk port error count exceeded the threshold.
 
 	
 	.EXAMPLE
-		Get-V7000System -ComputerName 172.0.0.10
+		Get-V7KMdisk
+
+        Returns all Mdisks
 	
 	.EXAMPLE
-		Give another example of how to use it
+		Get-V7KMidk -Id 2
+
+        Returns the MDisk with an Id of 2
 	  
 	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
+
+    .PARAMETER Id
+        The Id of a MDisk
+
+    .PARAMETER Name
+        The Name of a MDisk
 	
   #>
    [CmdletBinding(DefaultParameterSetName="All")]
@@ -757,10 +797,19 @@ function Get-V7KMDiskGroup {
 		Gets the mDisk groups of a IBM V7000
 	
 	.EXAMPLE
-		Get-V7000DiskGroup -ComputerName 172.0.0.10
+		Get-V7KMDiskGroup
 	
 	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
+
+    .PARAMETER Id
+        The Id of a MDisk group
+
+    .PARAMETER Name
+        The Name of a MDisk group
+
+    .PARAMETER Bytes
+        Return sizes in bytes instead of the defaults
 	
   #>
   [CmdletBinding(DefaultParameterSetName="All")]
@@ -840,10 +889,16 @@ function Get-V7KIOGroup {
 		Gets a IBM V7000 IO Group
 	
 	.EXAMPLE
-		Get-V7000System -ComputerName 172.0.0.10
+		Get-V7KIOGroup
 	
     .PARAMETER ComputerName
 		IP address or DNS name of the V7000
+
+    .PARAMETER Id
+        The Id of an IO group
+
+    .PARAMETER Name
+        The Name of an IO group
 	
   #>
   [CmdletBinding(DefaultParameterSetName="All")]
@@ -914,11 +969,8 @@ function Get-V7KSystem {
         code level and ip address
 	
 	.EXAMPLE
-		Get-V7000System -ComputerName 172.0.0.10
+		Get-V7KSystem
 	
-	.EXAMPLE
-		Give another example of how to use it
-	  
 	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
 	
@@ -956,19 +1008,33 @@ function Get-V7KVDisk {
 		Gets the VDisks of a IBM V7000
 	
 	.DESCRIPTION
-		Gets the system information for an IBM V7000, this includes capacity info
-        code level and ip address
-        Due to the way information is returned when querying a single vdisk, the NoteProperty
-        for the copy is preapended with a c. i.e status becomes cstatus
+		Return volumes (vDisks) on the V7000
 	
 	.EXAMPLE
-		Get-V7000System -HostName 172.0.0.10
+		Get-V7KVDisk
 	
+        Returns all of the volumes on a V7000
 	.EXAMPLE
-		Give another example of how to use it
+		Get-V7KVdisk -Id 1
+
+        Returns the volume with the Id 1
+
+    .EXAMPLE
+        Get-V7KVdisk -Filter {name=Test}
+
+        Returns the volume named 'Test'
 	  
-	.PARAMETER HostName
+	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
+
+    .PARAMETER Id
+        Returns a volume with a specific Id
+
+    .PARAMETER Filter
+        Returns all volumes matching a filter
+
+    .PARAMETER Bytes
+        Returns all sizes in bytes
 	
   #>
   [CmdletBinding(DefaultParameterSetName="All")]
@@ -995,97 +1061,43 @@ function Get-V7KVDisk {
 		#$SessionId = $Global:DefaultV7K.SessionID
 	    $cmd = "lsvdisk -delim ,"
 	    if ($Bytes) {$cmd += " -bytes"}
-	    if ($Id) {$cmd += " -filtervalue id=$Id"}
+	    #if ($Id) {$cmd += " -filtervalue id=$Id"}
 		if ($Filter) { $cmd += " -filtervalue $Filter" }
 	}
 	
 	process {
- 
-        $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
-        $Item = ConvertFrom-Csv $info
-        $item | Add-Member -MemberType NoteProperty -Name ComputerName -Value $ComputerName
-        $Item | ForEach-Object {$_.PSObject.TypeNames.Insert(0,’SVC.vDisk’)}
-
-  
-  }
-
-  end {
-    
-    return $Item
-  }
-} 
-
-function Get-V7KVDiskById {
-  <#
-  	.SYNOPSIS
-		Gets the VDisks of a IBM V7000
-	
-	.DESCRIPTION
-		Gets the system information for an IBM V7000, this includes capacity info
-        code level and ip address
-        Due to the way information is returned when querying a single vdisk, the NoteProperty
-        for the copy is preapended with a c. i.e status becomes cstatus
-	
-	.EXAMPLE
-		Get-V7000System -HostName 172.0.0.10
-	
-	.EXAMPLE
-		Give another example of how to use it
-	  
-	.PARAMETER HostName
-		IP address or DNS name of the V7000
-	
-  #>
-  [CmdletBinding(DefaultParameterSetName="All")]
-  param
-  (
-    [Parameter(ValueFromPipeline=$True)]
-    [Alias('host')]
-    [string]$ComputerName = $Global:DefaultV7K.Host,
-    [Parameter(Mandatory=$True,ParameterSetName='ID',Position=0)]
-    [int[]]$Id,
-    [Parameter(Mandatory=$True,ParameterSetName='Name')]
-    [string]$Filter,
-    [switch]$Bytes
-
-  )
-
-	begin {
-		$SessionId = Get-V7KConnection $ComputerName
-		If ($SessionId -eq $null)
-		{
-			Write-Error "Not connected to $($ComputerName)"
-			break
-		}
-		#$SessionId = $Global:DefaultV7K.SessionID
-	    $cmd = "lsvdisk -delim ,"
-	    if ($Bytes) {$cmd += " -bytes"}
-	    $orgcmd = $cmd
-	}
-	
-	process {
- 
-        $cmd += " $Id"
-        $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
-        $item = New-Object PSObject
-        $lines = $info -split "\s+"
-        foreach ($line in $lines)
+        if ($Id)
         {
-            $split = $line.Split(",")                
-            $header = $Split[0]
-            if ($Split[0]) {
-                if ($Split[1] -eq $null) {
-                    $Split[1] = ""
-                }
-                if (($Item | Get-Member).Name -eq $Split[0]) {
-                    $item | Add-Member NoteProperty "$header$Split[1]" $Split[1]
+            $cmd += " $Id"
+            $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
+            $item = New-Object PSObject
+            $lines = $info -split "\s+"
+            foreach ($line in $lines)
+            {
+                $split = $line.Split(",")                
+                $header = $Split[0]
+                if ($Split[0]) {
+                    if ($Split[1] -eq $null) {
+                        $Split[1] = ""
+                    }
+                    if (($Item | Get-Member).Name -eq $Split[0]) {
+                        $item | Add-Member NoteProperty "$header$Split[1]" $Split[1]
+                    }
+                    
                 }
                 
             }
-            
+            $item | Add-Member -MemberType NoteProperty -Name ComputerName -Value $ComputerName
+            $Item | ForEach-Object {$_.PSObject.TypeNames.Insert(0,’SVC.vDisk’)}
         }
-        $item | Add-Member -MemberType NoteProperty -Name ComputerName -Value $ComputerName
-        $Item | ForEach-Object {$_.PSObject.TypeNames.Insert(0,’SVC.vDisk’)}
+        else 
+        {
+            $info = (Invoke-SSHCommand -SessionId $sessionid -Command $cmd).Output
+            $Item = ConvertFrom-Csv $info
+            $item | Add-Member -MemberType NoteProperty -Name ComputerName -Value $ComputerName
+            $Item | ForEach-Object {$_.PSObject.TypeNames.Insert(0,’SVC.vDisk’)}
+        }
+        
 
   
   }
@@ -1105,13 +1117,87 @@ function New-V7KVDisk {
 		Creates a new vdisks on an IBM V7000
 	
 	.EXAMPLE
-		New-V7000VDisk New-V7000VDisk -ComputerName 172.0.0.1 -Mdiskgrp SAS_Pool_1 -name C_SAS_Pool_1_NHSWL -Size 2500 -Unit gb
+		New-V7KVDisk -Mdiskgrp SAS_Pool_1 -name Volume_1 -Size 2500 -Unit gb
+
+        Creates a new volume is the pool called SAS_Pool_1 with a name of 'Volume_1' with a size of 2500GB
 	
 	.EXAMPLE
 		Give another example of how to use it
 	  
-	.PARAMETER HostName
+	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
+    
+
+    .PARAMETER Mdiskgrp
+
+
+    .PARAMETER IOgrp
+
+
+    .PARAMETER name
+
+
+    .PARAMETER cache
+
+
+    .PARAMETER Size
+
+
+    .PARAMETER Rsize 
+
+
+    .PARAMETER Unit 
+
+
+    .PARAMETER Warning 
+
+
+    .PARAMETER GrainSize 
+
+
+    .PARAMETER Copies
+
+
+    .PARAMETER syncrate
+
+
+    .PARAMETER vtype
+
+
+    .PARAMETER Autoexpand
+
+
+    .PARAMETER Import
+
+
+    .PARAMETER createsync
+
+
+    .PARAMETER FormatDisk
+
+
+    .PARAMETER Compressed
+
+
+    .PARAMETER mirrorwritepriority
+
+
+    .PARAMETER node, 
+
+
+    .PARAMETER mdisk,  
+
+
+    .PARAMETER Accessiogrp,  
+
+
+    .PARAMETER tier
+
+
+    .PARAMETER easytier
+
+
+    .PARAMETER udid   
 	
   #>
   [CmdletBinding(SupportsShouldProcess=$True,ConfirmImpact='High')]
@@ -1266,10 +1352,10 @@ function Set-V7KVDisk {
         91 - 100 64 MB
 	
 	.EXAMPLE
-		Set-V7KVDisk -ComputerName 172.0.0.1 -NewName vDisk22 -Id 2
+		Set-V7KVDisk -NewName vDisk22 -Id 2
 	
 	.EXAMPLE
-		Set-V7KVDisk -ComputerName 172.0.0.1 -AutoExpand on -Id 2
+		Set-V7KVDisk -AutoExpand on -Id 2
 	  
 	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
@@ -1458,14 +1544,14 @@ function Remove-V7KVDisk {
         volume (and any data that resides on it) is no longer required. 
 	
 	.EXAMPLE
-		Remove-V7000VDisk -ComputerName 172.0.0.10 -Id 2
+		Remove-V7KVDisk -Id 2
 	
 	.EXAMPLE
-		Get-V7000VDisk -ComputerName 172.0.0.10 -Id 2 | Remove-V7000VDisk
+		Get-V7KVDisk -Id 2 | Remove-V7KVDisk
 
 	.EXAMPLE
-		$vdisk = Get-V7000VDisk -ComputerName 172.0.0.10  | Where-Object {$_.Name -like '*Test*'}
-        Remove-V7000VDisk -Vdisk $vdisk
+		$vdisk = Get-V7KVDisk  | Where-Object {$_.Name -like '*Test*'}
+        Remove-V7KVDisk -Vdisk $vdisk
 
         This example removes all the vDisk that contain the word Test in thier name
 	  
@@ -1577,12 +1663,9 @@ function Get-V7KHost {
 		Gets the connected hosts to a IBM V7000
 	
 	.EXAMPLE
-		Get-V7000System
-	
-	.EXAMPLE
-		Give another example of how to use it
+		Get-V7KHost
 	  
-	.PARAMETER HostName
+	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
 	
   #>
@@ -1743,19 +1826,27 @@ function Get-V7KVDiskHostMap {
 function Add-V7KvDiskHostMap {
   <#
   	.SYNOPSIS
-		Gets the connect Hosts to a IBM V7000
+		Adds a Volume to a host
 	
 	.DESCRIPTION
-		Gets the connected hosts to a IBM V7000
+		Adds a volume to a host
 	
 	.EXAMPLE
-		Get-V7000System -HostName 172.0.0.10
+		Add-V7KVDiskHostMap -Id 1 -HostId 2
+
+        Adds the volume with an id of 1 to the host with an id of 2
 	
 	.EXAMPLE
 		Give another example of how to use it
 	  
-	.PARAMETER HostName
+	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
+
+    .PARAMETER Id
+        The Id of the Volume.  Can be obtained by running Get-V7KVDisk
+
+    .PARAMETER HostId
+        The ID of the Configured host.  Can by obtained by running Get-V7KHost
 	
   #>
   [CmdletBinding()]
@@ -1765,7 +1856,7 @@ function Add-V7KvDiskHostMap {
     [Alias('host')]
     [string]$ComputerName = $Global:DefaultV7K.Host,
     [Parameter(Mandatory=$True,ValueFromPipelineByPropertyName=$True)]
-    [string]$Hostid,
+    [string]$HostId,
     [Parameter(Mandatory=$True,ValueFromPipelineByPropertyName=$True)]
     [int[]]$Id
   )
@@ -1790,19 +1881,26 @@ function Add-V7KvDiskHostMap {
 function Remove-V7KvDiskHostMap {
   <#
   	.SYNOPSIS
-		Gets the connect Hosts to a IBM V7000
+		Removes a vDisk from host
 	
 	.DESCRIPTION
-		Gets the connected hosts to a IBM V7000
+		Remove a volume from a host
 	
 	.EXAMPLE
-		Get-V7000System -HostName 172.0.0.10
+		Get-V7KVDiskHostMap -id 2 | Remove-V7KVDiskHostMap
+
+    .EXAMPLE
+        Remove-V7KVdiskHostMap -Id 3 -HostId 2
 	
-	.EXAMPLE
-		Give another example of how to use it
-	  
-	.PARAMETER HostName
+	.PARAMETER ComputerName
 		IP address or DNS name of the V7000
+
+    .PARAMETER Id
+
+    .PARAMETER HostId
+
+    .PARAMETER HostMap
+        To the the host map use Get-V7KVDiskHostMap
 	
   #>
   [CmdletBinding(SupportsShouldProcess=$True,ConfirmImpact='High',DefaultParameterSetName="Obj")]
