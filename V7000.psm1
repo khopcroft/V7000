@@ -199,7 +199,9 @@ function Get-V7KReplication {
 
 	
 	.EXAMPLE
-		Get-V7000ReplicationStatus -ComputerName 172.0.0.1
+		Get-V7KReplicationStatus
+
+        Returns a list of all replications.
 	
 	  
 	.PARAMETER ComputerName
