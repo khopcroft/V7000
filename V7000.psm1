@@ -1,13 +1,11 @@
 ﻿Function Connect-V7K {
 <#
     .SYNOPSIS
-        Creates SSH sessions to remote SSH-compatible hosts, such as Linux
-        or Unix computers or network equipment. You can later issue commands
-        to be executed on one or more of these hosts.
+        Creates SSH sessions to an IBM V7000.
 
     .DESCRIPTION
-        Once you've created a session, you can use Invoke-SSHCommand
-        to send commands to the remote host or hosts.
+        Once you've created a session, you can use any of the other Cmdlets without specifying which
+        system you wish to connect to
 
         The authentication is done here. If you specify -KeyFile, that will be used. 
         Key file specified. Will override password. If you specify a password and no key, 
@@ -21,26 +19,38 @@
         Required. DNS names or IP addresses for target hosts to establish
         a connection to using the provided username and key/password.
     
-    .PARAMETER Username
-        Required. The username used for connecting.
     
     .PARAMETER KeyFile
         Optional. Specify the path to a private key file for authenticating.
         Overrides a specified password.
+
+        Please note the KeyFile needs to be in OpenSSH format.
     
-    .PARAMETER Password
-        Optional. You can specify a key, or leave out the password to be prompted
-        for a password which is typed in interactively and will not be displayed.
+    .PARAMETER Credential
+        Credtials for logging on to the V7000.  If you are using a KeyFile and have created a Keyfile 
+        with no password leave the password blank when entering credentials
     
-    .PARAMETER Port
-        Optional. Default 22. Target port the SSH server uses.
+    .EXAMPLE
+        Connect-V7K -ComputerName V7000.domain.com
+
+        This will connect to a V7000, prompting for credentials
+
+    .EXAMPLE
+        $Cred = Get-Credentials
+        Connect-V7k -ComputerName V7000.domain.com -Credential $Cred
+
+    .EXAMPLE
+        Connect-V7K -ComputerName V7000.domain.com -KeyFile C:\Temp\MyKeyFile
+
+        Connects to a V7000 using a KeyFile.  You will be promtped for credentials.  If your KeyFile does not
+        have a password, just enter a username.
 #>
     [CmdletBinding(DefaultParameterSetName="'Credential")]
     param(
      [Parameter(Position=0,Mandatory=$true)]
-     [string[]] $ComputerName,
-     $Credential,
-     $KeyFile
+     [string] $ComputerName,
+     [PSCredential]$Credential,
+     [string]$KeyFile
      
     )
     Import-Module Posh-SSH
@@ -67,6 +77,27 @@
 }
 
 function Get-V7KConnection {
+<#
+    .SYNOPSIS
+        Gets existing connections to a V7000.
+
+    .DESCRIPTION
+        Returns the SSH session id for existing connections whether connected or disconnected
+
+    .PARAMETER ComputerName
+        DNS name or IP addresses for target host.
+
+    .EXAMPLE
+        Get-V7KConnection
+
+        Returns the Session ID for the connection defined in $global:DefaultV7K
+
+    .EXAMPLE
+        Get-V7KConnection -ComputerName V7000.domain.com
+
+        Returns the session id for the host that matches the ComputerName
+    
+#>
 	param (
 		[Parameter()]
 		[string]$ComputerName
@@ -80,6 +111,11 @@ function Get-V7KConnection {
 	{
 		$SessionId = (Get-SSHSession | where-Object {$_.Host -eq $Computername}).SessionId
 	}
+    if (-not $SessionId)
+    {
+        Write-Error "$($ComputerName) is not connected"
+        break
+    }
 	$SessionId
 }
 
@@ -3452,79 +3488,6 @@ Function Convert-V7KMonFileList {
 				$obj
 			}
 		}
-	}
-}
-
-Function Get-V7KSCPFile
-{
-<#
-.Synopsis
-   Download a file using SCP
-.DESCRIPTION
-   Download a file using SCP
-.EXAMPLE
-   Example of how to use this cmdlet
-.EXAMPLE
-   Another example of how to use this cmdlet
-#>
-	[CmdletBinding()]
-	Param
-	(
-		[Parameter(ValueFromPipeline = $True)]
-		[string]$ComputerName = $Global:DefaultV7K.Host,
-		[int]$Port = 22,
-		$Credential = (Get-Credential),
-		[Parameter(ParameterSetName = 'KeyFile')]
-		[string]$KeyFile,
-		[Parameter(ParameterSetName = 'GlKeyFile')]
-		[switch]$UseGlobalKeyFile,
-		[Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-		[PSCustomObject]$Source,
-		[string]$Destination
-	)
-	
-	Begin
-	{
-		If ($UseGlobalKeyFile)
-		{
-			$KeyFile = $global:KeyFile
-			$User = $Credential.UserName
-			$Key = New-Object Renci.SshNet.PrivateKeyFile -ArgumentList $KeyFile
-			$SCPClient = New-Object Renci.SshNet.SCPClient($ComputerName, $Port, $User, $Key)
-		}
-		If ($KeyFile)
-		{
-			$User = $Credential.UserName
-			$Key = New-Object Renci.SshNet.PrivateKeyFile -ArgumentList $KeyFile
-			$SCPClient = New-Object Renci.SshNet.SCPClient($ComputerName, $Port, $User, $Key)
-		}
-		else
-		{
-			$SCPClient = New-Object Renci.SshNet.SCPClient($ComputerName, $Port, $User, $Password)
-		}
-		
-		$SCPClient.Connect()
-		Write-Verbose "$($SCPClient)"
-	}
-	Process
-	{
-		
-		$SourceFullName = "/dumps/iostats/$($_.FileName)"
-		Write-Verbose "$($SourceFullName)"
-		$DestFullName = "$Destination\$($_.FileName)"
-		Write-Verbose "$($DestFullName)"
-		[System.IO.FileStream]$fWriter = New-Object System.IO.FileStream($DestFullName, [System.IO.FileMode]::OpenOrCreate)
-		$writer = New-Object System.IO.StreamWriter($fWriter)
-		$SCPClient.Download($SourceFullName, $fwriter)
-		
-		$writer.Close()
-		$fWriter.Close()
-		Start-Sleep -Seconds 1
-	}
-	End
-	{
-		$SCPClient.Disconnect()
-		$SCPClient.Dispose()
 	}
 }
 
