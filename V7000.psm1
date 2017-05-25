@@ -505,21 +505,22 @@ function Start-V7KReplication {
 		Start replication on a IBM V7000
 	
 	.EXAMPLE
-		Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | Start-V7000Replication
+		Get-V7KReplication | Start-V7000Replication
+
+        Starts all replications from the default connected V7000
 	
 	.EXAMPLE
-		Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -ne 'consistent_synchronized'} | Start-V7000Replication
+		Get-V7KReplication -State consistent_stopped | Start-V7000Replication
+
+        Starts all replications where the state of the replication is consistent_stopped
 
     .EXAMPLE
-		$relationship = Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -ne 'consistent_synchronized'}
+		$relationship = Get-V7KReplication -State consistent_stopped
         Start-V7000Replication -Relationship $relationship
 
     .EXAMPLE
-		$relationship = Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -ne 'consistent_synchronized'}
+		$relationship = Get-V7KReplication -State consistent_stopped
         $relationship | Start-V7000Replication
-	  
-	.PARAMETER ComputerName
-		IP address or DNS name of the V7000
 	
   #>
   [CmdletBinding()]
@@ -556,21 +557,23 @@ function Stop-V7KReplication {
 		Stops replication on a IBM V7000
 	
 	.EXAMPLE
-		Get-V7000Replication -ComputerName 172.0.0.10 | Stop-V7000Replication
+		Get-V7KReplication | Stop-V7000Replication
 	
 	.EXAMPLE
-		Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -eq 'consistent_synchronized'} | Stop-V7000Replication
+		Get-V7KReplication -State consistent_synchronized | Stop-V7000Replication
+
+        Stops all replications who state is consistent_syncronized
    
    .EXAMPLE
-		$relationship = Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -eq 'consistent_synchronized'}
+		$relationship = Get-V7KReplication -State consistent_synchronized
         Stop-V7000Replication -Relationship $relationship
 
     .EXAMPLE
-		$relationship = Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -eq 'consistent_synchronized'}
+		$relationship = Get-V7KReplication -State consistent_synchronized
         $relationship | Stop-V7000Replication
          
 	.PARAMETER Relationship
-		The replication relationship.  This can be got from Get-V7000Replication
+		The replication relationship.  This can be got from Get-V7KReplication
 	
   #>
   [CmdletBinding()]
@@ -602,27 +605,23 @@ function Stop-V7KReplication {
 function Switch-V7KReplication {
   <#
   	.SYNOPSIS
-		Stops replication on a IBM V7000
+		Switches the direction of a replication on a IBM V7000
 	
 	.DESCRIPTION
-		Stops replication on a IBM V7000
+		Switches the direction of a replication on a IBM V7000
 	
 	.EXAMPLE
-		Get-V7000Replication -ComputerName 172.0.0.10 | Stop-V7000Replication
-	
-	.EXAMPLE
-		Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -eq 'consistent_synchronized'} | Stop-V7000Replication
-   
-   .EXAMPLE
-		$relationship = Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -eq 'consistent_synchronized'}
-        Stop-V7000Replication -Relationship $relationship
+		Get-V7KReplication | Switch-V7KReplication -Primary aux
 
-    .EXAMPLE
-		$relationship = Get-V7000ReplicationStatus -ComputerName 172.0.0.10 | where-object {$_.State -eq 'consistent_synchronized'}
-        $relationship | Stop-V7000Replication
-         
+        Switches all replications to the aux copy
+	
+	.EXAMPLE
+		Get-V7KReplication -Id 84 | Switch-V7KReplication -Primary aux
+
+        Switches the replication with the Id of 84 to the aux copy
+   
 	.PARAMETER Relationship
-		The replication relationship.  This can be got from Get-V7000Replication
+		The replication relationship.  This can be got from Get-V7KReplication
 	
   #>
 	[CmdletBinding()]
